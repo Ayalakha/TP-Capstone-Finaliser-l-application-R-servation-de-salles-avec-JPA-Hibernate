@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+
+    <persistence-unit name="ReservationPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>com.example.model.Utilisateur</class>
+        <class>com.example.model.Salle</class>
+        <class>com.example.model.Equipement</class>
+        <class>com.example.model.Reservation</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <!-- Seules les entites annotees @Cacheable vont dans le cache de second niveau -->
+        <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+
+        <properties>
+            <!-- Connexion par defaut : H2 en memoire (mode MySQL).
+                 Surchargee par JpaUtil via -Ddb.url / -Ddb.user / -Ddb.password -->
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:reservation;DB_CLOSE_DELAY=-1;MODE=MySQL"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="hibernate.connection.pool_size" value="10"/>
+
+            <!-- Le schema est gere par les scripts de migration (MigrationExecutor) :
+                 Hibernate se contente de verifier que le mapping correspond a la base. -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+
+            <!-- Cache de second niveau (JCache / Ehcache 3) -->
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.jcache.JCacheRegionFactory"/>
+            <property name="hibernate.javax.cache.provider" value="org.ehcache.jsr107.EhcacheCachingProvider"/>
+            <property name="hibernate.javax.cache.uri" value="ehcache.xml"/>
+            <property name="hibernate.javax.cache.missing_cache_strategy" value="create-warn"/>
+
+            <!-- Statistiques pour PerformanceReport -->
+            <property name="hibernate.generate_statistics" value="true"/>
+
+            <!-- Logs SQL : passer show_sql a true (ou -Dhibernate.show_sql=true) pour voir
+                 quelles entites sont lues en base et lesquelles viennent du cache. -->
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>

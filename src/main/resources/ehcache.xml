@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration Ehcache 3 des regions du cache de second niveau Hibernate.
+  Le nom de chaque cache = nom de la region Hibernate (nom complet de l'entite / de la collection).
+-->
+<config xmlns="http://www.ehcache.org/v3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
+
+    <cache-template name="entite">
+        <expiry>
+            <ttl unit="minutes">30</ttl>
+        </expiry>
+        <heap unit="entries">1000</heap>
+    </cache-template>
+
+    <!-- Donnees de reference modifiables (READ_WRITE) -->
+    <cache alias="com.example.model.Utilisateur" uses-template="entite"/>
+    <cache alias="com.example.model.Salle" uses-template="entite"/>
+    <cache alias="com.example.model.Salle.equipements" uses-template="entite"/>
+
+    <!-- Donnees immuables (READ_ONLY) : pas d'expiration -->
+    <cache alias="com.example.model.Equipement">
+        <expiry>
+            <none/>
+        </expiry>
+        <heap unit="entries">200</heap>
+    </cache>
+
+    <!-- Cache des requetes (resultats = listes d'identifiants) -->
+    <cache alias="default-query-results-region">
+        <expiry>
+            <ttl unit="minutes">5</ttl>
+        </expiry>
+        <heap unit="entries">500</heap>
+    </cache>
+
+    <!-- Horodatage des dernieres modifications de chaque table : ne doit jamais expirer -->
+    <cache alias="default-update-timestamps-region">
+        <expiry>
+            <none/>
+        </expiry>
+        <heap unit="entries">5000</heap>
+    </cache>
+</config>
